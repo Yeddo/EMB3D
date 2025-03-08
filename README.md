@@ -43,8 +43,9 @@ or
 
 pip install -r requirements.txt
 
+---
 
-🛠 Usage
+## 🛠 Usage
 
 📌 Option 1: Use Local JSON Files (download them yourself) (You will be prompted to enter the file paths for threats.json, mitigations.json, and properties.json.)
 
@@ -60,15 +61,17 @@ python3 emb3d_jsonParser.py
 
 python3 emb3d_jsonParser.py -Format
 
+---
 
-
-📂 Directory Structure
+## 📂 Directory Structure
 
 📂 emb3d-json-parser
 │── emb3d_jsonParser.py      # Main script
 │── requirements.txt         # List of dependencies
 │── README.md                # Documentation
 
-📜 License
+---
+
+## 📜 License
 
 This project is licensed under the MIT License.
