@@ -1,103 +1,79 @@
-MITRE EMB3D JSON Parser
+### 📌 MITRE EMB3D JSON Parser
 
-Overview
+**Author:** Jason Bisnette  
+**Date:** March 2025  
 
-This script is designed to extract, process, and format MITRE's EMB3D JSON data into a structured Excel spreadsheet.
-It helps rebuild the MITRE EMB3D mapping spreadsheet when MITRE releases updates.
-Features
+![Python](https://img.shields.io/badge/Python-3.x-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-✔ Extracts & Maps Data:
+---
 
-    Properties (PID) → Threats (TID)
-    Threats (TID) → Mitigations (MID)
-    ✔ Handles JSON data from either local files or GitHub.
-    ✔ Optional Excel formatting for readability (-Format flag).
-    ✔ Automatically installs missing dependencies.
+## 📖 Overview
+This script extracts, processes, and formats MITRE EMB3D JSON data into an Excel file.
+It is used to rebuild the **MITRE EMB3D mapping spreadsheet** when updates are released.
 
-Installation
-Clone the Repository
+### 🔹 Features
+✔ **Extracts & Maps Data**:
+- **Properties (PID)** → **Threats (TID)**
+- **Threats (TID)** → **Mitigations (MID)**  
+✔ **Handles JSON data from either local files or GitHub.**  
+✔ **Optional Excel formatting (`-Format` flag).**  
+✔ **Automatically installs missing dependencies.**  
 
+---
+
+## 🚀 Installation
+
+### **1️⃣ Clone the Repository**
+```bash
 git clone https://github.com/YOUR_GITHUB_USERNAME/emb3d-json-parser.git
 cd emb3d-json-parser
 
-Install Dependencies
-
-Ensure you have Python 3.x installed, then run:
+2️⃣ Install Dependencies
 
 pip install -r requirements.txt
 
-(The script will automatically install missing dependencies if needed.)
-Usage
-Basic Execution (Use Local JSON Files)
+(The script will auto-install missing dependencies if needed.)
+🛠 Usage
+Run the Script
+📌 Option 1: Use Local JSON Files
 
 python3 emb3d_jsonParser.py
 
-    The script will prompt you for the paths to:
-        threats.json
-        mitigations.json
-        properties.json
-
-Auto-Download JSON from GitHub
+(You will be prompted to enter the file paths for threats.json, mitigations.json, and properties.json.)
+📌 Option 2: Download JSON from GitHub
 
 python3 emb3d_jsonParser.py
 
-    Choose option 2 when prompted, and the script will fetch the latest JSON from MITRE's GitHub.
+    Choose option 2 when prompted to automatically fetch JSON from MITRE’s GitHub.
 
-Enable Excel Formatting
+📌 Option 3: Apply Excel Formatting
 
 python3 emb3d_jsonParser.py -Format
 
-    The script will process the data and apply formatting to the Excel file.
-
-Example Output
-
-After running the script, an Excel file (emb3d_mapping.xlsx) is generated with the following structure:
+(Applies bold headers, column auto-sizing, and cell merging.)
+📊 Example Output (Excel File)
 Property ID (PID)	Property Description	Threat ID (TID)	Threat Description	Mitigation ID (MID)	Mitigation Description
 PID-001	Property 1 Description	TID-001	Threat 1 Description	MID-001	Mitigation 1 Description
 PID-002	Property 2 Description	TID-002	Threat 2 Description	MID-002	Mitigation 2 Description
-Dependencies
+🔧 Dependencies
 
-The script requires the following Python libraries:
+The script requires:
 
-    pandas → Handles data in a structured format.
-    requests → Fetches JSON data from MITRE's GitHub.
+    pandas → Handles structured data.
+    requests → Fetches JSON from MITRE's GitHub.
     openpyxl → Writes and formats Excel files.
 
-Manually Install Dependencies (If Needed)
+Install Dependencies Manually
 
 pip install pandas requests openpyxl
 
-How It Works
-1️⃣ Fetch JSON Data
-
-The script loads JSON files from either:
-
-    GitHub (MITRE EMB3D public repo)
-    Local JSON files (user-provided)
-
-2️⃣ Parse & Process Data
-
-    Extracts Property IDs (PIDs)
-    Extracts Threat IDs (TIDs)
-    Extracts Mitigation IDs (MIDs)
-    Maps PIDs → TIDs and TIDs → MIDs
-
-3️⃣ Export Data to Excel
-
-    Saves the processed data as emb3d_mapping.xlsx.
-    Optionally applies formatting (bold headers, column auto-sizing, and merged cells).
-
-Code Structure
+📂 Directory Structure
 
 📂 emb3d-json-parser
 │── emb3d_jsonParser.py      # Main script
 │── requirements.txt         # List of dependencies
 │── README.md                # Documentation
 
-Contributing
-
-Feel free to submit issues or pull requests to improve the script.
-For major changes, please open an issue first to discuss the proposal.
-License
+📜 License
 
 This project is licensed under the MIT License.
