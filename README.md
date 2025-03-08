@@ -56,6 +56,7 @@ python3 emb3d_jsonParser.py -Format
 | Property ID (PID)    | Property Description    | Threat ID (TID)     | Threat Description     | Mitigation ID (MID)    | Mitigation Description  |
 +----------------------+-------------------------+---------------------+------------------------+------------------------+-------------------------+
 | PID-001             | Property 1 Description  | TID-001             | Threat 1 Description   | MID-001                | Mitigation 1 Description|
+|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | PID-002             | Property 2 Description  | TID-002             | Threat 2 Description   | MID-002                | Mitigation 2 Description|
 +----------------------+-------------------------+---------------------+------------------------+------------------------+-------------------------+
 
