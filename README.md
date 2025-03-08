@@ -35,26 +35,30 @@ pip install -r requirements.txt
 (The script will auto-install missing dependencies if needed.)
 🛠 Usage
 Run the Script
-📌 Option 1: Use Local JSON Files
+📌 Option 1: Use Local JSON Files (download them yourself) (You will be prompted to enter the file paths for threats.json, mitigations.json, and properties.json.)
 
 python3 emb3d_jsonParser.py
 
-(You will be prompted to enter the file paths for threats.json, mitigations.json, and properties.json.)
 📌 Option 2: Download JSON from GitHub
 
 python3 emb3d_jsonParser.py
 
     Choose option 2 when prompted to automatically fetch JSON from MITRE’s GitHub.
 
-📌 Option 3: Apply Excel Formatting
+📌 Option 3: Apply Excel Formatting (bold headers, cell merging of adjacent duplicates for readability, column resizing, and some centering of text).
 
 python3 emb3d_jsonParser.py -Format
 
-(Applies bold headers, column auto-sizing, and cell merging.)
-📊 Example Output (Excel File)
-Property ID (PID)	Property Description	Threat ID (TID)	Threat Description	Mitigation ID (MID)	Mitigation Description
-PID-001	Property 1 Description	TID-001	Threat 1 Description	MID-001	Mitigation 1 Description
-PID-002	Property 2 Description	TID-002	Threat 2 Description	MID-002	Mitigation 2 Description
+## 📊 Example Output (Excel File)
+
+```plaintext
++----------------------+-------------------------+---------------------+------------------------+------------------------+-------------------------+
+| Property ID (PID)    | Property Description    | Threat ID (TID)     | Threat Description     | Mitigation ID (MID)    | Mitigation Description  |
++----------------------+-------------------------+---------------------+------------------------+------------------------+-------------------------+
+| PID-001             | Property 1 Description  | TID-001             | Threat 1 Description   | MID-001                | Mitigation 1 Description|
+| PID-002             | Property 2 Description  | TID-002             | Threat 2 Description   | MID-002                | Mitigation 2 Description|
++----------------------+-------------------------+---------------------+------------------------+------------------------+-------------------------+
+
 🔧 Dependencies
 
 The script requires:
