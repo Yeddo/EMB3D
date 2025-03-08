@@ -44,7 +44,7 @@ or
 pip install -r requirements.txt
 
 🛠 Usage
-Run the Script
+
 📌 Option 1: Use Local JSON Files (download them yourself) (You will be prompted to enter the file paths for threats.json, mitigations.json, and properties.json.)
 
 python3 emb3d_jsonParser.py
