@@ -1,5 +1,5 @@
 """
-MITRE EMB3D JSON Parser w/optional excel formatting for beautification
+MITRE EMB3D JSON Parser w/optional excel formatting for readability
 Author: Jason Bisnette
 Date: March 2025
 
