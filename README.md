@@ -1,8 +1,5 @@
 MITRE EMB3D JSON Parser
 
-Author: Jason Bisnette
-Date: March 2025
-
 Overview
 
 This script is designed to extract, process, and format MITRE's EMB3D JSON data into a structured Excel spreadsheet.
@@ -18,12 +15,12 @@ Features
     ✔ Automatically installs missing dependencies.
 
 Installation
-1️⃣ Clone the Repository
+Clone the Repository
 
 git clone https://github.com/YOUR_GITHUB_USERNAME/emb3d-json-parser.git
 cd emb3d-json-parser
 
-2️⃣ Install Dependencies
+Install Dependencies
 
 Ensure you have Python 3.x installed, then run:
 
