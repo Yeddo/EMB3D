@@ -67,11 +67,11 @@ python3 emb3d_jsonParser.py -Format
 
 📂 emb3d-json-parser
 
-│── emb3d_jsonParser.py      # Main script
+    │── emb3d_jsonParser.py      # Main script
 
-│── requirements.txt         # List of dependencies
+    │── requirements.txt         # List of dependencies
 
-│── README.md                # Documentation
+    │── README.md                # Documentation
 
 ---
 
