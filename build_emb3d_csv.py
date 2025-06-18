@@ -17,7 +17,7 @@ import re
 import time
 import argparse
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 from bs4 import BeautifulSoup
@@ -25,100 +25,123 @@ from tqdm import tqdm
 
 RAW_BASE = "https://raw.githubusercontent.com/mitre/emb3d/main"
 MAPPING_PATH = "_data/threats_properties_mitigations_mappings.json"
-THREADS = 12                # tune for your bandwidth
-RETRY  = 3                  # simple retry loop
+THREADS = 12
+RETRY   = 3
 
 
+# --------------------------------------------------------------------------- #
+#                               helper functions                              #
+# --------------------------------------------------------------------------- #
 def fetch(url: str) -> str:
-    """HTTP GET with basic retry/back-off."""
+    """HTTP GET with simple exponential back-off retry."""
     for attempt in range(1, RETRY + 1):
         r = requests.get(url, timeout=30)
         if r.ok:
             return r.text
         wait = 2 ** attempt
-        tqdm.write(f"[warn] {url} -> {r.status_code}, retry {attempt}/{RETRY} in {wait}s")
+        tqdm.write(f"[warn] {url} -> {r.status_code}  (retry {attempt}/{RETRY} in {wait}s)")
         time.sleep(wait)
-    r.raise_for_status()   # last error
+    r.raise_for_status()           # propagate last error
 
 
-# ---------- Threat helpers -------------------------------------------------
+def extract_ids(lines: list[str], pattern: str) -> list[str]:
+    """Return the first regex match from each line (if any)."""
+    rx = re.compile(pattern)
+    ids = []
+    for txt in lines:
+        m = rx.search(txt)
+        if m:
+            ids.append(m.group(0))
+    return ids
 
+
+# ----------------------------- threat page parser --------------------------- #
 def parse_threat_html(html: str) -> dict[str, str]:
-    """Return {description, poc, kew, cve, cwe} from a TID page."""
     soup = BeautifulSoup(html, "html.parser")
-    get_section = lambda hdr: soup.find(id=re.compile(hdr, re.I))
-    def list_texts(start_hdr: str) -> list[str]:
-        hdr = get_section(start_hdr)
-        if not hdr:
-            return []
-        ul = hdr.find_next("ul")
-        return [li.get_text(" ", strip=True) for li in ul.find_all("li", recursive=False)] if ul else []
 
-    desc_hdr = get_section("threat-description")
+    def hdr(name):               # locate an <h2 id="..."> by loose pattern
+        return soup.find(id=re.compile(name, re.I))
+
+    def list_under(h2_pattern: str) -> list[str]:
+        h = hdr(h2_pattern)
+        if not h:
+            return []
+        ul = h.find_next("ul")
+        return [li.get_text(" ", strip=True)
+                for li in ul.find_all("li", recursive=False)] if ul else []
+
+    desc_hdr = hdr("threat-description")
     description = desc_hdr.find_next("p").get_text(" ", strip=True) if desc_hdr else ""
 
-    poc_links = list_texts("Proof of Concept")
-    kew_links = list_texts("Known Exploitable Weakness")
-    cve_links = list_texts(r"\bCVE\b")
-    cwe_links = list_texts(r"\bCWE\b")
+    poc_lines  = list_under("Proof of Concept")
+
+    cve_lines  = list_under(r"\bCVE\b")
+    cwe_lines  = list_under(r"\bCWE\b")
 
     return {
         "description": description,
-        "poc": "; ".join(poc_links),
-        "kew": "; ".join(kew_links),
-        "cve": "; ".join(cve_links),
-        "cwe": "; ".join(cwe_links),
+        "poc": "; ".join(poc_lines),
+
+        # identifiers only
+        "cve": "; ".join(extract_ids(cve_lines, r"CVE-\d{4}-\d{4,7}")),
+        "cwe": "; ".join(extract_ids(cwe_lines, r"CWE-\d+")),
     }
 
-# ---------- Mitigation helpers ---------------------------------------------
 
+# --------------------------- mitigation page parser ------------------------- #
 def parse_mitigation_html(html: str) -> dict[str, str]:
-    """Return {description, regs} from an MID page."""
     soup = BeautifulSoup(html, "html.parser")
+
     desc_hdr = soup.find(id=re.compile("^description$", re.I))
     description = desc_hdr.find_next("p").get_text(" ", strip=True) if desc_hdr else ""
 
-    mapping_hdr = soup.find(id=re.compile("mappings?", re.I))
+    map_hdr = soup.find(id=re.compile("mappings?", re.I))
     regs = []
-    if mapping_hdr:
-        ul = mapping_hdr.find_next("ul")
-        regs = [li.get_text(" ", strip=True) for li in ul.find_all("li", recursive=False)] if ul else []
+    if map_hdr:
+        ul = map_hdr.find_next("ul")
+        regs = [li.get_text(" ", strip=True)
+                for li in ul.find_all("li", recursive=False)] if ul else []
 
     return {"description": description, "regs": "; ".join(regs)}
 
-# ---------- Workers --------------------------------------------------------
 
+# ------------------------------ worker wrappers ---------------------------- #
 def threat_worker(tid: str) -> dict[str, str]:
-    url = f"{RAW_BASE}/threats/{tid}.html"
-    return parse_threat_html(fetch(url))
+    return parse_threat_html(fetch(f"{RAW_BASE}/threats/{tid}.html"))
+
 
 def mitigation_worker(mid: str) -> dict[str, str]:
-    url = f"{RAW_BASE}/mitigations/{mid}.html"
-    return parse_mitigation_html(fetch(url))
+    return parse_mitigation_html(fetch(f"{RAW_BASE}/mitigations/{mid}.html"))
 
-# ---------- Main -----------------------------------------------------------
 
+# ---------------------------------- main ----------------------------------- #
 def build_csv(out_csv: Path) -> None:
-    # 1. Pull master JSON map ------------------------------------------------
     mapping_json = requests.get(f"{RAW_BASE}/{MAPPING_PATH}", timeout=30).json()
 
-    # 2. Kick off parallel pre-fetch of all threat + mitigation pages -------
+    # PID text lookup for rows where `"text"` is missing
+    property_lookup = {
+        p["id"]: p["text"]
+        for t in mapping_json["threats"]
+        for p in t["properties"]
+        if "text" in p
+    }
+
     tids = {t["id"] for t in mapping_json["threats"]}
     mids = {m["id"] for t in mapping_json["threats"] for m in t["mitigations"]}
 
     tqdm.write(f"Fetching {len(tids)} threats & {len(mids)} mitigations …")
+
     with ThreadPoolExecutor(max_workers=THREADS) as exe:
-        threat_futures = {exe.submit(threat_worker, tid): tid for tid in tids}
-        mitigation_futures = {exe.submit(mitigation_worker, mid): mid for mid in mids}
+        threat_info = {tid: fut.result()
+                       for fut, tid in tqdm(
+                           {exe.submit(threat_worker, tid): tid for tid in tids}.items(),
+                           desc="Threats", total=len(tids))}
 
-        threat_info     = {tid: future.result()
-                           for future, tid in tqdm(threat_futures.items(),
-                                                   desc="Threats", total=len(tids))}
-        mitigation_info = {mid: future.result()
-                           for future, mid in tqdm(mitigation_futures.items(),
-                                                   desc="Mitigations", total=len(mids))}
+        mitig_info  = {mid: fut.result()
+                       for fut, mid in tqdm(
+                           {exe.submit(mitigation_worker, mid): mid for mid in mids}.items(),
+                           desc="Mitigations", total=len(mids))}
 
-    # 3. Flatten to rows -----------------------------------------------------
     header = [
         "Property ID", "Property text",
         "Threat ID", "Threat text", "Threat Description",
@@ -135,31 +158,35 @@ def build_csv(out_csv: Path) -> None:
         for threat in mapping_json["threats"]:
             tid = threat["id"]
             t_extra = threat_info.get(tid, {})
+            poc_val = t_extra.get("poc", "")              # single source for PoC
+
             for prop in threat["properties"]:
+                prop_id   = prop["id"]
+                prop_text = prop.get("text") or property_lookup.get(prop_id, "")
+
                 for mitig in threat["mitigations"]:
                     mid = mitig["id"]
-                    m_extra = mitigation_info.get(mid, {})
+                    m_extra = mitig_info.get(mid, {})
 
-                    row = {
-                        "Property ID": prop["id"],
-                        "Property text": prop.get("text", ""),
+                    writer.writerow({
+                        "Property ID":   prop_id,
+                        "Property text": prop_text,
 
-                        "Threat ID": tid,
-                        "Threat text": threat["text"],
-                        "Threat Description": t_extra.get("description", ""),
-                        "Threat Proof of Concept": t_extra.get("poc", ""),
-                        "Threat Known Exploitable Weakness": t_extra.get("kew", ""),
-                        "CVE": t_extra.get("cve", ""),
-                        "CWE": t_extra.get("cwe", ""),
+                        "Threat ID":     tid,
+                        "Threat text":   threat["text"],
+                        "Threat Description":               t_extra.get("description", ""),
+                        "Threat Proof of Concept":          poc_val,
+                        "Threat Known Exploitable Weakness": poc_val,   # per new requirement
+                        "CVE":                              t_extra.get("cve", ""),
+                        "CWE":                              t_extra.get("cwe", ""),
 
-                        "Mitigation ID": mid,
+                        "Mitigation ID":   mid,
                         "Mitigation Text": mitig["text"],
                         "Mitigation Level": mitig["level"].capitalize(),
 
-                        "Mitigation Description": m_extra.get("description", ""),
-                        "Mitigation Regulatory Mapping": m_extra.get("regs", ""),
-                    }
-                    writer.writerow(row)
+                        "Mitigation Description":          m_extra.get("description", ""),
+                        "Mitigation Regulatory Mapping":   m_extra.get("regs", ""),
+                    })
 
     tqdm.write(f"[ok] Wrote {out_csv} ({out_csv.stat().st_size/1024:.1f} KiB)")
 
