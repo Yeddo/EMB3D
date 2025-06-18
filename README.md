@@ -13,9 +13,7 @@
 * **Scrapes** every threat (`TID-###`) and mitigation (`MID-###`) web page to pull  
   * threat description, PoC / Known-Exploit links, CVEs, CWEs  
   * mitigation description and IEC 62443-4-2 (or other) regulatory mappings
-* **Emits one CSV row per `PID × TID × MID`** with a fixed 14-column schema.
-
-No placeholders, no manual curation – pure automation. 🚀
+* **Produces one CSV row per `PID × TID × MID`** with a fixed 14-column schema.
 
 ---
 
