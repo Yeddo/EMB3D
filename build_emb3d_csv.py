@@ -7,16 +7,17 @@ Last Updated: June 2025
 
 Purpose
 -------
-Rebuild the EMB3D mapping spreadsheet whenever MITRE publishes an update.
+Rebuild the entire EMB3D mapping (PID -> TID -> MID) into a flattened .csv 
+whenever MITRE publishes an update (6 month intervals).
 
     • Downloads the canonical JSON mapping from the EMB3D GitHub repository
     • Scrapes every Threat (TID-###) and Mitigation (MID-###) page to collect
       descriptions, Proof-of-Concept links, CVEs, CWEs, and regulatory mappings
-    • Produces a flat, analysis-ready CSV with one row per PID × TID × MID
+    • Produces a flat, analysis-ready CSV with one row per PID -> TID -> MID
 
 Usage
 -----
-    python3 build_emb3d_csv.py                # → emb3d_mapping.csv
+    python3 build_emb3d_csv.py                # emb3d_mapping.csv
     python3 build_emb3d_csv.py -o my.csv      # custom output name
 
 Dependencies
@@ -63,12 +64,12 @@ def fetch(url: str) -> str:
     """Return text of *url* with exponential back-off + retry."""
     for attempt in range(1, RETRY + 1):          # Try up to RETRY times
         r = requests.get(url, timeout=30)        # Issue GET request
-        if r.ok:                                 # Success → return body
+        if r.ok:                                 # Success -> return body
             return r.text
-        wait = 2 ** attempt                      # Exponential back-off seconds
+        wait = 2 ** attempt                      # Back-off seconds
         tqdm.write(f"[warn] {url} -> {r.status_code}  (retry {attempt}/{RETRY} in {wait}s)")
         time.sleep(wait)                         # Sleep before next attempt
-    r.raise_for_status()                         # All retries failed → raise
+    r.raise_for_status()                         # All retries failed -> raise
 
 def extract_ids(lines: list[str], pattern: str) -> list[str]:
     """Return list of regex *pattern* matches (e.g., CVE-IDs) from lines."""
@@ -110,7 +111,7 @@ def parse_threat_html(html: str) -> dict[str, str]:
     cve_lines = list_under(r"\bcve\b")                    # CVE bullet list
     cwe_lines = list_under(r"\bcwe\b")                    # CWE bullet list
 
-    return {                                   # Assemble dict for caller
+    return {                                   # Dictionary for caller
         "description": description,
         "poc": "; ".join(poc_lines),           # Join PoC entries with semicolon
         "cve": "; ".join(extract_ids(cve_lines, r"CVE-\d{4}-\d{4,7}")),
