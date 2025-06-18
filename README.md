@@ -1,4 +1,4 @@
-# EMB3D CSV Builder :arrow_heading_down:
+# EMB3D CSV Builder
 
 *Flatten the entire MITRE EMB3D™ property → threat → mitigation knowledge base into a clean, analysis-ready CSV – in minutes.*
 
