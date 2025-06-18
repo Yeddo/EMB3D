@@ -233,6 +233,6 @@ def build_csv(out_csv: Path) -> None:
 # ────────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Build MITRE-EMB3D mapping CSV")  # Argument parser
-    ap.add_argument("-o", "--output", default="emb3d_mapping.csv",             # Output path flag
+    ap.add_argument("-o", "--output", default="data/emb3d_mapping.csv",             # Output path flag
                     type=Path, help="CSV file to write (default: emb3d_mapping.csv)")
     build_csv(ap.parse_args().output)                                          # Delegate to main workflow
