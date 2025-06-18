@@ -142,7 +142,7 @@ def build_csv(out_csv: Path) -> None:
 
                     row = {
                         "Property ID": prop["id"],
-                        "Property text": prop["text"],
+                        "Property text": prop.get("text", ""),
 
                         "Threat ID": tid,
                         "Threat text": threat["text"],
