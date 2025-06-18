@@ -3,7 +3,9 @@
 *Flatten the entire MITRE EMB3D™ property → threat → mitigation knowledge base into a clean, analysis-ready CSV – in minutes.*
 
 [![Latest release](https://img.shields.io/github/v/release/YOURORG/emb3d-csv-builder?logo=github)](../../releases)
-[![CI](https://github.com/YOURORG/emb3d-csv-builder/actions/workflows/ci.yml/badge.svg)](../../actions)
+![Python](https://img.shields.io/badge/Python-3.x-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+[![CI](https://github.com/Yeddo/EMB3D/actions/workflows/ci.yml/badge.svg)](https://github.com/Yeddo/EMB3D/actions/workflows/ci.yml)
+
 
 ---
 
