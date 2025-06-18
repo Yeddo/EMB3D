@@ -27,14 +27,13 @@
 | 4 | `Threat text` | headline |
 | 5 | `Threat Description` | first paragraph on threat page |
 | 6 | `Threat Proof of Concept` | PoC links (`;`-separated) |
-| 7 | `Threat Known Exploitable Weakness` | *same value as PoC (col 6)* |
-| 8 | `CVE` | identifiers only (`CVE-YYYY-NNNN…`) |
-| 9 | `CWE` | identifiers only (`CWE-####`) |
-|10 | `Mitigation ID` | `MID-###` |
-|11 | `Mitigation Text` | headline |
-|12 | `Mitigation Level` | Foundational / Intermediate / Leading |
-|13 | `Mitigation Description` | first paragraph on mitigation page |
-|14 | `Mitigation Regulatory Mapping` | e.g. “IEC 62443 4-2 EDR 3.14” |
+| 7 | `CVE` | identifiers only (`CVE-YYYY-NNNN…`) |
+| 8 | `CWE` | identifiers only (`CWE-####`) |
+| 9 | `Mitigation ID` | `MID-###` |
+|10 | `Mitigation Text` | headline |
+|11 | `Mitigation Level` | Foundational / Intermediate / Leading |
+|12 | `Mitigation Description` | first paragraph on mitigation page |
+|13 | `Mitigation Regulatory Mapping` | e.g. “IEC 62443 4-2 EDR 3.14” |
 
 ---
 
