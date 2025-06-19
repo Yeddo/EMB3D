@@ -1,16 +1,14 @@
-# EMB3D STIX CSV Builder 📦➡️📊
+# EMB3D STIX CSV Builder
 
-A lightweight **one-file** utility that converts the latest **MITRE EMB3D™ STIX bundle**  
-into the familiar PID → TID → MID mapping CSV.
+Fetches the latest MITRE EMB3D™ STIX bundle and flattens it into a PID → TID → MID CSV.
 
-| Feature | Description |
-|---------|-------------|
-| 🔍 **Auto-discovers latest bundle** | Lists `assets/` on GitHub and fetches the highest `emb3d-stix-*.json`. |
-| 🗜 **Single download, no scraping** | Entire knowledge base lives in one JSON → fewer network calls and fewer deps. |
-| 📄 **13-column flat CSV** | Identical schema to the earlier scraper, so downstream tools keep working. |
-| 🏷 **MIT‐style license** | Free to integrate into pipelines or dashboards. |
+## Features
 
-## Quick start
+- **Auto-discover & download** the newest `emb3d-stix-*.json` via GitHub API  
+- **No HTML scraping** — all data from STIX properties & relationships  
+- **Identical 13-column schema** for seamless downstream use  
+
+## Quick Start
 
 ```bash
 git clone https://github.com/Yeddo/EMB3D.git
@@ -18,3 +16,54 @@ cd EMB3D
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 python build_emb3d_csv_from_stix.py           # → emb3d_mapping.csv
+
+Command-line options
+
+    -o, --output : set custom CSV filename (default: emb3d_mapping.csv)
+
+CSV Columns
+
+    Property ID
+    Property text
+    Threat ID
+    Threat text
+    Threat Description
+    Threat Proof of Concept
+    CVE
+    CWE
+    Mitigation ID
+    Mitigation Text
+    Mitigation Level
+    Mitigation Description
+    Mitigation Regulatory Mapping
+
+(Optional) GitHub Actions
+name: Build EMB3D CSV
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python build_emb3d_csv_from_stix.py
+      - name: Commit & push
+        run: |
+          git config user.name  "emb3d-bot"
+          git config user.email "emb3d-bot@example.com"
+          git add emb3d_mapping.csv
+          git commit -m "chore: update CSV" || echo "No changes"
+          git push
+
+[![CSV build](https://github.com/Yeddo/EMB3D/actions/workflows/ci.yml/badge.svg)](https://github.com/Yeddo/EMB3D/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/Yeddo/EMB3D?logo=github)](https://github.com/Yeddo/EMB3D/releases)
+
+License: MIT
+Data: MITRE EMB3D™ © MITRE under its Terms of Use
