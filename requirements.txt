@@ -1,0 +1,3 @@
+# requirements.txt
+requests
+packaging        # used for robust semantic-version sorting
