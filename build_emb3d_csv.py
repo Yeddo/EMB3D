@@ -1,22 +1,36 @@
 #!/usr/bin/env python3
 """
 MITRE EMB3D CSV Builder
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Uses MITRE’s STIX bundle from the public GitHub repo and
-flattens it into one row per PID→TID→MID CSV, no HTML scraping.
+Author      : Jason Bisnette
+Created     : March 2025
+Last Updated: June 2025
 
-Key design points
------------------
-* **Every datum comes from the STIX bundle itself.**
+Purpose
+-------
+Rebuild the entire EMB3D mapping (PID -> TID -> MID) into a flattened .csv.
+
+    • Uses MITRE's STIX bundle from the public GitHub repo and
+      flattens it.
+    • Scrapes every Threat (TID-###) and Mitigation (MID-###) page to collect
+      descriptions, Proof-of-Concept links, CVEs, CWEs, and regulatory mappings
+    • Produces a flat, analysis-ready CSV with one row per PID -> TID -> MID
+
+Features
+--------
 * **Auto-discovers the newest STIX file** in
   `https://github.com/mitre/emb3d/tree/main/assets/` (version-aware).
 * **Zero external deps** beyond the Python 3 stdlib
-  (✧ optional `packaging` for nicer version sorting).
+  (- optional `packaging` for nicer version sorting).
 
 Usage
 -----
     python3 build_emb3d_csv_from_stix.py                # → emb3d_mapping.csv
     python3 build_emb3d_csv_from_stix.py -o out.csv     # custom output name
+
+License
+-------
+This script is released under the MIT License.
+MITRE EMB3D™ content is © MITRE and used under its Terms of Use.
 """
 
 from __future__ import annotations
