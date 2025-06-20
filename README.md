@@ -12,9 +12,8 @@
 ## ✨ What it does
 * **Downloads** the authoritative mapping file   
   `emb3d-stix*.json` from the MITRE EMB3D GitHub repo (https://github.com/mitre/emb3d/tree/main/assets).
-* **Scrapes** every threat (`TID-###`) and mitigation (`MID-###`) web page to pull  
-  * threat description, PoC / Known-Exploit links, CVEs, CWEs  
-  * mitigation description and IEC 62443-4-2 (or other) regulatory mappings
+* **Scrapes** STIX .jason to pull threat description, PoC / Known-Exploit links, CVEs, CWEs,  
+  * mitigation description and regulatory mappings.
 * **Produces one CSV row per `PID -> TID -> MID`** with a fixed 14-column schema.
 
 ---
@@ -53,8 +52,7 @@ Fetches the latest MITRE EMB3D™ STIX bundle and flattens it into a PID → TID
 ## Features
 
 - **Auto-discover & download** the newest `emb3d-stix-*.json` via GitHub API  
-- **No HTML scraping** — all data from STIX properties & relationships  
-- **Identical 13-column schema** for seamless downstream use  
+- **All data from STIX properties & relationships    
 
 ## Quick Start
 
